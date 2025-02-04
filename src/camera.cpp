@@ -9,7 +9,9 @@ void Camera::MoveTo(const vec3f& position) noexcept
 
 void Camera::Move(const vec3f& direction) noexcept
 {
-	m_position += direction;
+	vec4f dirView = { direction.x, direction.y, direction.z, 0.0f };
+	vec4f dirWorld = m_rotation * dirView;
+	m_position += dirWorld.xyz();
 }
 
 void Camera::Rotate(const long mousedx, const long mousedy, float sensitivity) noexcept 
@@ -20,6 +22,8 @@ void Camera::Rotate(const long mousedx, const long mousedy, float sensitivity) n
 	m_pitch = clamp(m_pitch, -maxPitch, maxPitch);
 
 	m_rotation = mat4f::rotation(0, m_yaw, m_pitch);
+
+	ViewToWorld = mat4f::translation(m_position) * m_rotation;
 }
 
 mat4f Camera::WorldToViewMatrix() const noexcept

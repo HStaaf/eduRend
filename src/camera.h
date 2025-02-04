@@ -81,6 +81,7 @@ private:
 
     linalg::vec3f m_position;
     linalg::mat4f m_rotation;
+	linalg::mat4f ViewToWorld;
 };
 
 #endif
