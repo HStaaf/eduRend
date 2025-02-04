@@ -79,7 +79,7 @@ class OurTestScene : public Scene
 	// CBuffer for transformation matrices
 	ID3D11Buffer* m_transformation_buffer = nullptr;
 	// + other CBuffers
-
+	ID3D11Buffer* m_lightcam_buffer = nullptr;
 	//
 	// Scene content
 	//
@@ -91,7 +91,6 @@ class OurTestScene : public Scene
 	Model* m_moon;
 
 	mat4f m_sponza_transform;
-	mat4f m_quad_transform;
 	mat4f m_sun_transform;
 	mat4f m_earth_transform;
 	mat4f m_moon_transform;
@@ -105,8 +104,14 @@ class OurTestScene : public Scene
 	float m_camera_velocity = 5.0f;	// Camera movement velocity in units/s
 	float m_fps_cooldown = 0;
 
+	linalg::vec4f m_lightPosition;
+
 	void InitTransformationBuffer();
 	void UpdateTransformationBuffer(mat4f model_to_world_matrix, mat4f world_to_view_matrix, mat4f projection_matrix);
+
+	void InitLightCamBuffer();
+	void UpdateLightCamBuffer(vec4f camera_position, vec4f light_position);
+	vec4f GetLightPosition() const;
 
 public:
 	/**

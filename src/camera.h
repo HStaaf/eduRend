@@ -40,6 +40,7 @@ public:
     void Move(const linalg::vec3f& direction) noexcept;
 
     void Rotate(const long mousedx, const long mousedy, float sensitivity) noexcept;
+    linalg::vec3f GetPosition() const noexcept { return m_position; }
 
     /**
      * @brief Changes the camera aspect ratio.

@@ -29,8 +29,9 @@ protected:
 	ID3D11DeviceContext* const	m_dxdevice_context; //!< Graphics context, use for binding resources and draw commands.
 
 	// Pointers to the class' vertex & index arrays
-	ID3D11Buffer* m_vertex_buffer = nullptr; //!< Pointer to gpu side vertex buffer
-	ID3D11Buffer* m_index_buffer = nullptr; //!< Pointer to gpu side index buffer
+	ID3D11Buffer* m_vertex_buffer   = nullptr; //!< Pointer to gpu side vertex buffer
+	ID3D11Buffer* m_index_buffer    = nullptr; //!< Pointer to gpu side index buffer
+	ID3D11Buffer* m_material_buffer = nullptr;
 
 public:
 
@@ -55,6 +56,7 @@ public:
 	{ 
 		SAFE_RELEASE(m_vertex_buffer);
 		SAFE_RELEASE(m_index_buffer);
+		SAFE_RELEASE(m_material_buffer);
 	}
 };
 
