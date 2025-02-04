@@ -3,8 +3,8 @@ Texture2D texDiffuse : register(t0);
 
 cbuffer LightCamBuffer : register(b0)
 {
-    float4 CameraPosition; // vec4f for camera position
-    float4 LightPosition; // vec4f for light position
+    float4 CameraPosition; 
+    float4 LightPosition; 
 };
 
 cbuffer MaterialBuffer : register(b1)
@@ -30,17 +30,33 @@ struct PSIn
 
 float4 PS_main(PSIn input) : SV_Target
 {
-	// Debug shading #1: map and return normal as a color, i.e. from [-1,1]->[0,1] per component
-	// The 4:th component is opacity and should be = 1
-	//return float4(input.Normal*0.5+0.5, 1);
-	
-	 // Calculate light direction
-    float3 lightDir = normalize(LightPosition.xyz - input.Pos.xyz);
 
-    // Calculate diffuse lighting
-    float diffuse = max(dot(input.Normal, lightDir), 0.0);
-	
+    // Calculating L 
+    float3 lightDirection = normalize(LightPosition.xyz - input.Pos.xyz);
+
+    // Calculating V
+    float3 viewDirection = normalize(CameraPosition.xyz - input.Pos.xyz);
+
+    // Ambient lighting
+    float3 ambient = AmbientColor;
+
+    // Calculate L * N
+    float diffuseFactor = max(dot(input.Normal, lightDirection), 0.0);
+
+    //Calculating k_d(L*N)
+    float3 diffuse = DiffuseColor * diffuseFactor;
+
+    // Calculating (R*V)^a
+    float3 reflectDirection = reflect(-lightDirection, input.Normal);
+    float specFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), Shininess);
+
+    //Calculating k_s(R*V)^a
+    float3 specular = SpecularColor * specFactor;
+    
+    // Add results
+    float3 color = ambient + diffuse + specular;
+
     // Return the shaded color
-    return float4(diffuse, diffuse, diffuse, 1.0);
-	
+    return float4(color, 1.0);
+    	
 }

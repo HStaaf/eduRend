@@ -1,11 +1,7 @@
 #include "OBJModel.h"
 
-OBJModel::OBJModel(
-	const std::string& objfile,
-	ID3D11Device* dxdevice,
-	ID3D11DeviceContext* dxdevice_context)
-	: Model(dxdevice, dxdevice_context)
-{
+OBJModel::OBJModel(const std::string& objfile, ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Model(dxdevice, dxdevice_context){
+
 	// Load the OBJ
 	OBJLoader* mesh = new OBJLoader();
 	mesh->Load(objfile);
@@ -101,6 +97,12 @@ void OBJModel::Render() const
 	{
 		// Fetch material
 		const Material& material = m_materials[indexRange.MaterialIndex];
+
+		// Update the material buffer
+		UpdateMaterialBuffer(material);
+
+		// Bind the material buffer to slot b1 of the pixel shader
+		m_dxdevice_context->PSSetConstantBuffers(1, 1, &m_material_buffer);
 
 		// Bind diffuse texture to slot t0 of the PS
 		m_dxdevice_context->PSSetShaderResources(0, 1, &material.DiffuseTexture.TextureView);

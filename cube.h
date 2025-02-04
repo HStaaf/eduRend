@@ -4,6 +4,7 @@
 class Cube : public Model
 {
 	unsigned m_number_of_indices = 0;
+	Material m_material;
 
 public:
 	/**

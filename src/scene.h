@@ -111,6 +111,7 @@ class OurTestScene : public Scene
 
 	void InitLightCamBuffer();
 	void UpdateLightCamBuffer(vec4f camera_position, vec4f light_position);
+
 	vec4f GetLightPosition() const;
 
 public:

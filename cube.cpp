@@ -3,6 +3,9 @@
 
 Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Model(dxdevice, dxdevice_context)
 {
+	m_material.DiffuseColour = { 1.0f, 0.0f, 0.0f }; 
+	m_material.SpecularColour = { 1.0f, 1.0f, 1.0f }; 
+
 	// Vertex and index arrays
 	// Once their data is loaded to GPU buffers, they are not needed anymore
 	std::vector<Vertex> vertices;
@@ -200,6 +203,13 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 void Cube::Render() const
 {
+	// Update the material buffer
+	UpdateMaterialBuffer(m_material);
+
+	// Bind the material buffer to slot b1 of the pixel shader
+	m_dxdevice_context->PSSetConstantBuffers(1, 1, &m_material_buffer);
+
+
 	// Bind our vertex buffer
 	const UINT32 stride = sizeof(Vertex); //  sizeof(float) * 8;
 	const UINT32 offset = 0;
