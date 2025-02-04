@@ -11,7 +11,7 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	// Populate the vertex array with 4 Vertices
 	Vertex v0, v1, v2, v3, v4, v5, v6, v7;
 
-	#pragma region Front face
+	#pragma region Creating Front face
 	v0.Position = { -0.5, -0.5f, 0.0f };
 	v0.Normal = { 0, 0, 1 };
 	v0.TexCoord = { 0, 0 };
@@ -27,12 +27,13 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	v3.Position = { -0.5, 0.5f, 0.0f };
 	v3.Normal = { 0, 0, 1 };
 	v3.TexCoord = { 1, 0 };
+	#pragma endregion
 
-	// Push Top face to vertex index
-	vertices.push_back(v0);
-	vertices.push_back(v1);
-	vertices.push_back(v2);
-	vertices.push_back(v3);
+	#pragma region Push Top face to vertex and triangle indices
+	vertices.push_back(v0); // [0]
+	vertices.push_back(v1); // [1]
+	vertices.push_back(v2); // [2]
+	vertices.push_back(v3); // [3]
 
 	// Triangle #1
 	indices.push_back(0);
@@ -43,10 +44,9 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	indices.push_back(1);
 	indices.push_back(2);
 	indices.push_back(3);
-
 	#pragma endregion
 
-	#pragma region Back face
+	#pragma region Creating Back face
 	v4.Position = { -0.5, -0.5f, -1.0f };
 	v4.Normal = { 0, 0, -1 };
 	v4.TexCoord = { 0, 0 };
@@ -62,12 +62,14 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	v7.Position = { -0.5, 0.5f, -1.0f };
 	v7.Normal = { 0, 0, -1 };
 	v7.TexCoord = { 1, 0 };
+	#pragma endregion
 
-	// Push Bottom face to vertex index
-	vertices.push_back(v4);
-	vertices.push_back(v5);
-	vertices.push_back(v6);
-	vertices.push_back(v7);
+	#pragma region Push Back face to vertex and triangle indices
+	// Push Back face to vertex index
+	vertices.push_back(v4); // [4]
+	vertices.push_back(v5); // [5]
+	vertices.push_back(v6); // [6]
+	vertices.push_back(v7); // [7]
 
 	// Triangle #3
 	indices.push_back(4);
@@ -78,30 +80,91 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	indices.push_back(5);
 	indices.push_back(7);
 	indices.push_back(6);
-
+	#pragma endregion
+	
+	#pragma region Creating Right face
+	v1.Normal = v2.Normal = v5.Normal = v6.Normal = { 1, 0, 0 };
 	#pragma endregion
 
-	//Right face
-	v1.Normal = v2.Normal = v5.Normal = v6.Normal = { 1, 0, 0 };
-	v1.TexCoord = { 0, 0 };
-	v2.TexCoord = { 0, 1 };
-	v5.TexCoord = { 1, 1 };
-	v6.TexCoord = { 1, 0 };
-
-	vertices.push_back(v1);
-	vertices.push_back(v2);
-	vertices.push_back(v5);
-	vertices.push_back(v6);
+	#pragma region Push Right face to vertex and triangle indices
+	vertices.push_back(v1); // [8]
+	vertices.push_back(v2); // [9]
+	vertices.push_back(v5); // [10]
+	vertices.push_back(v6); // [11]
 
 	// Triangle #4
 	indices.push_back(10);
-	indices.push_back(11);
 	indices.push_back(9);
+	indices.push_back(8);
 
+	// Triangle #5
+	indices.push_back(9);
+	indices.push_back(10);
+	indices.push_back(11);
+	#pragma endregion
 
+	#pragma region Creating Left face
+	v0.Normal = v3.Normal = v4.Normal = v7.Normal = { -1, 0, 0 };
+	#pragma endregion
 
-	// Populate the index array with two triangles
-	// 
+	#pragma region Push Left face to vertex and triangle indices
+	vertices.push_back(v0); // [12]
+	vertices.push_back(v3); // [13]
+	vertices.push_back(v4); // [14]
+	vertices.push_back(v7); // [15]
+
+	// Triangle #6
+	indices.push_back(12);
+	indices.push_back(13);
+	indices.push_back(14);
+
+	// Triangle #7
+	indices.push_back(15);
+	indices.push_back(14);
+	indices.push_back(13);
+	#pragma endregion
+
+	#pragma region Creating Top face
+	v2.Normal = v3.Normal = v6.Normal = v7.Normal = { 0, 1, 0 };
+	#pragma endregion
+
+	#pragma region Push Top face to vertex and triangle indices
+	vertices.push_back(v2); // [16]
+	vertices.push_back(v3); // [17]
+	vertices.push_back(v6); // [18]
+	vertices.push_back(v7); // [19]
+
+	// Triangle #8
+	indices.push_back(18);
+	indices.push_back(17);
+	indices.push_back(16);
+
+	// Triangle #9
+	indices.push_back(17);
+	indices.push_back(18);
+	indices.push_back(19);
+	#pragma endregion
+
+	#pragma region Creating Bottom face
+	v0.Normal = v1.Normal = v4.Normal = v5.Normal = { 0, 1, 0 };
+	#pragma endregion
+
+	#pragma region Push Bottom face to vertex and triangle indices
+	vertices.push_back(v0); // [20]
+	vertices.push_back(v1); // [21]
+	vertices.push_back(v4); // [22]
+	vertices.push_back(v5); // [23]
+
+	// Triangle #10
+	indices.push_back(22);
+	indices.push_back(21);
+	indices.push_back(20);
+
+	// Triangle #11
+	indices.push_back(21);
+	indices.push_back(22);
+	indices.push_back(23);
+	#pragma endregion
 
 
 	// Vertex array descriptor

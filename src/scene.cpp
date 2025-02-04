@@ -50,7 +50,9 @@ void OurTestScene::Init()
 
 	// Create objects
 	m_sponza = new OBJModel("assets/crytek-sponza/sponza.obj", m_dxdevice, m_dxdevice_context);
-	m_cube = new Cube(m_dxdevice, m_dxdevice_context);
+	m_sun    = new Cube(m_dxdevice, m_dxdevice_context);
+	m_earth  = new Cube(m_dxdevice, m_dxdevice_context);
+	m_moon   = new Cube(m_dxdevice, m_dxdevice_context);
 }
 
 //
@@ -71,6 +73,14 @@ void OurTestScene::Update(
 	if (input_handler.IsKeyPressed(Keys::Left) || input_handler.IsKeyPressed(Keys::A))
 		m_camera->Move({ -m_camera_velocity * dt, 0.0f, 0.0f });
 
+
+	long mousedx = input_handler.GetMouseDeltaX();
+	long mousedy = input_handler.GetMouseDeltaY();
+
+	m_camera->Rotate(mousedx, mousedy, 0.002f);
+
+
+
 	// Now set/update object transformations
 	// This can be done using any sequence of transformation matrices,
 	// but the T*R*S order is most common; i.e. scale, then rotate, and then translate.
@@ -89,9 +99,20 @@ void OurTestScene::Update(
 	m_angle += m_angular_velocity * dt * 1.2f;
 
 	// Cube model-to-world transformation
-	m_cube_transform = mat4f::translation(0, 0, 0) *			// No translation
+	m_sun_transform = mat4f::translation(0, 0, 0) *			// No translation
 		mat4f::rotation(m_angle, 0.0f, 1.0f, 0.0f) *	// Rotate continuously around the y-axis
-		mat4f::scaling(1.0f, 1.0f, 1.0f);				// Scale uniformly to 150%
+		mat4f::scaling(0.5f, 0.5f, 0.5f);				// Scale uniformly to 150%
+
+	// Earth model-to-world transformation
+	m_earth_transform = m_sun_transform * mat4f::translation(2, 0, 0) *		// Translate 2 units to the right
+		mat4f::rotation(m_angle, 0.0f, 1.0f, 0.0f) *	// Rotate continuously around the y-axis
+		mat4f::scaling(0.3f, 0.3f, 0.3f);				// Scale uniformly to 30%
+
+	// Moon model-to-world transformation
+	m_moon_transform = m_earth_transform * mat4f::translation(1, 0, 0) *		// Translate 1 unit to the right
+		mat4f::rotation(m_angle, 0.0f, 1.0f, 0.0f) *	// Rotate continuously around the y-axis
+		mat4f::scaling(0.1f, 0.1f, 0.1f);				// Scale uniformly to 10%
+		
 
 	// Print fps
 	m_fps_cooldown -= dt;
@@ -120,15 +141,25 @@ void OurTestScene::Render()
 	m_sponza->Render();
 
 	// Load matrices + Cube's transformation to the device and render it
-	UpdateTransformationBuffer(m_cube_transform, m_view_matrix, m_projection_matrix);
-	m_cube->Render();
+	UpdateTransformationBuffer(m_sun_transform, m_view_matrix, m_projection_matrix);
+	m_sun->Render();
+
+	// Load matrices + Cube's transformation to the device and render it
+	UpdateTransformationBuffer(m_earth_transform, m_view_matrix, m_projection_matrix);
+	m_earth->Render();
+
+	// Load matrices + Cube's transformation to the device and render it
+	UpdateTransformationBuffer(m_moon_transform, m_view_matrix, m_projection_matrix);
+	m_moon->Render();
 }
 
 void OurTestScene::Release()
 {
 	SAFE_DELETE(m_sponza);
 	SAFE_DELETE(m_camera);
-	SAFE_DELETE(m_cube);
+	SAFE_DELETE(m_sun);
+	SAFE_DELETE(m_earth);
+	SAFE_DELETE(m_moon);
 
 	SAFE_RELEASE(m_transformation_buffer);
 	// + release other CBuffers

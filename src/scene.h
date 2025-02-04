@@ -86,11 +86,15 @@ class OurTestScene : public Scene
 	Camera* m_camera;
 
 	Model* m_sponza;
-	Model* m_cube;
+	Model* m_sun;
+	Model* m_earth;
+	Model* m_moon;
 
 	mat4f m_sponza_transform;
 	mat4f m_quad_transform;
-	mat4f m_cube_transform;
+	mat4f m_sun_transform;
+	mat4f m_earth_transform;
+	mat4f m_moon_transform;
 
 	mat4f m_view_matrix;
 	mat4f m_projection_matrix;
