@@ -10,7 +10,7 @@ void Camera::MoveTo(const vec3f& position) noexcept
 void Camera::Move(const vec3f& direction) noexcept
 {
 	vec4f dirView = { direction.x, direction.y, direction.z, 0.0f };
-	vec4f dirWorld = m_rotation * dirView;
+	vec4f dirWorld = ViewToWorld * dirView;
 	m_position += dirWorld.xyz();
 }
 

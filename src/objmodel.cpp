@@ -92,6 +92,9 @@ void OBJModel::Render() const
 	// Bind index buffer
 	m_dxdevice_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
 
+	// Bind the material buffer to slot b1 of the pixel shader
+	m_dxdevice_context->PSSetConstantBuffers(1, 1, &m_material_buffer);
+
 	// Iterate Drawcalls
 	for (auto& indexRange : m_index_ranges)
 	{
@@ -101,8 +104,7 @@ void OBJModel::Render() const
 		// Update the material buffer
 		UpdateMaterialBuffer(material);
 
-		// Bind the material buffer to slot b1 of the pixel shader
-		m_dxdevice_context->PSSetConstantBuffers(1, 1, &m_material_buffer);
+	
 
 		// Bind diffuse texture to slot t0 of the PS
 		m_dxdevice_context->PSSetShaderResources(0, 1, &material.DiffuseTexture.TextureView);

@@ -19,9 +19,10 @@ cbuffer MaterialBuffer : register(b1)
 
 struct PSIn
 {
-	float4 Pos  : SV_Position;
+	float4 Pos  : SV_Position; 
 	float3 Normal : NORMAL;
 	float2 TexCoord : TEX;
+    float3 PosWorld : WORLD;
 };
 
 //-----------------------------------------------------------------------------------------
@@ -32,10 +33,10 @@ float4 PS_main(PSIn input) : SV_Target
 {
 
     // Calculating L 
-    float3 lightDirection = normalize(LightPosition.xyz - input.Pos.xyz);
+    float3 lightDirection = normalize(LightPosition.xyz - input.PosWorld.xyz);
 
     // Calculating V
-    float3 viewDirection = normalize(CameraPosition.xyz - input.Pos.xyz);
+    float3 viewDirection = normalize(CameraPosition.xyz - input.PosWorld.xyz);
 
     // Ambient lighting
     float3 ambient = AmbientColor;
