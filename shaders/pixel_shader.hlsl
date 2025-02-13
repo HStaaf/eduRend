@@ -1,5 +1,6 @@
 
 Texture2D texDiffuse : register(t0);
+SamplerState texSampler : register(s0);
 
 cbuffer LightCamBuffer : register(b0)
 {
@@ -14,8 +15,6 @@ cbuffer MaterialBuffer : register(b1)
     float3 SpecularColor;
     float Shininess;
 };
-
-
 
 struct PSIn
 {
@@ -32,6 +31,9 @@ struct PSIn
 float4 PS_main(PSIn input) : SV_Target
 {
 
+    float2 scaledTexCoord = input.TexCoord * 2.0;
+    float4 texColor = texDiffuse.Sample(texSampler, scaledTexCoord);
+    
     // Calculating L 
     float3 lightDirection = normalize(LightPosition.xyz - input.PosWorld.xyz);
 
@@ -58,6 +60,6 @@ float4 PS_main(PSIn input) : SV_Target
     float3 color = ambient + diffuse + specular;
 
     // Return the shaded color
-    return float4(color, 1.0);
+    return float4(color, 1.0) * texColor;
     	
 }

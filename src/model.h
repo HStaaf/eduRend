@@ -34,6 +34,8 @@ protected:
 	ID3D11Buffer* m_index_buffer    = nullptr; //!< Pointer to gpu side index buffer
 	ID3D11Buffer* m_material_buffer = nullptr;
 
+
+
 public:
 
 	/**

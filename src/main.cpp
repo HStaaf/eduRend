@@ -49,6 +49,19 @@ static InputHandler				inputHandler;
 static Window					window;
 static std::unique_ptr<Scene>	scene;
 
+enum SamplerStateType
+{
+	SAMPLER_WRAP_POINT,
+	SAMPLER_WRAP_LINEAR,
+	SAMPLER_WRAP_ANISOTROPIC,
+	SAMPLER_MIRROR_POINT,
+	SAMPLER_CLAMP_POINT,
+	SAMPLER_COUNT
+};
+
+static ID3D11SamplerState* samplerStates[SAMPLER_COUNT];
+static SamplerStateType currentSamplerState = SAMPLER_WRAP_POINT;
+
 //--------------------------------------------------------------------------------------
 // Forward declarations
 //--------------------------------------------------------------------------------------
@@ -62,6 +75,9 @@ void				SetViewport(int width, int height);
 //void				InitShaderBuffers();
 void				Release();
 void				WinResize();
+void				InitSamplerStates();
+void				ChangeSampler(); 
+
 
 //--------------------------------------------------------------------------------------
 // Entry point to the program. Initializes everything and goes into a message processing 
@@ -102,6 +118,7 @@ int WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR, _I
 	if(SUCCEEDED(hr = InitDirect3DAndSwapChain(initialWinWidth, initialWinHeight)))
 	{
 		InitRasterizerState();
+		InitSamplerStates(); // Add this line
 
 		if (SUCCEEDED(hr = CreateRenderTargetView()) &&
 			SUCCEEDED(hr = CreateDepthStencilView(initialWinWidth, initialWinHeight)))
@@ -173,7 +190,7 @@ int WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR, _I
 		QueryPerformanceCounter((LARGE_INTEGER*)&currTimeStamp);
 		const float deltaTime = (currTimeStamp - prevTimeStamp) * secsPerCnt;
 		inputHandler.Update();
-		
+		ChangeSampler(); 
 		Update(deltaTime);
 		Render(deltaTime);
 
@@ -444,4 +461,78 @@ void Release()
 
 	inputHandler.Shutdown();
 	window.Shutdown();
+}
+
+void InitSamplerStates()
+{
+	D3D11_SAMPLER_DESC samplerDesc{};
+
+	// Wrap Point
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_WRAP_POINT]);
+
+	// Wrap Linear
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_WRAP_LINEAR]);
+
+	// Wrap Anisotropic
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.MaxAnisotropy = 16;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_WRAP_ANISOTROPIC]);
+
+	// Mirror Point
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_MIRROR_POINT]);
+
+	// Clamp Point
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_CLAMP_POINT]);
+}
+
+void SetCurrentSamplerState()
+{
+	deviceContext->PSSetSamplers(0, 1, &samplerStates[currentSamplerState]);
+}
+
+void ChangeSampler()
+{
+	if (inputHandler.IsKeyPressed(Keys::Up))
+	{
+		currentSamplerState = SAMPLER_WRAP_POINT;
+	}
+	else if (inputHandler.IsKeyPressed(Keys::Left))
+	{
+		currentSamplerState = SAMPLER_WRAP_LINEAR;
+	}
+	else if (inputHandler.IsKeyPressed(Keys::Right))
+	{
+		currentSamplerState = SAMPLER_WRAP_ANISOTROPIC;
+	}
+	else if (inputHandler.IsKeyPressed(Keys::Down))
+	{
+		currentSamplerState = SAMPLER_MIRROR_POINT;
+	}
+	//else if (inputHandler.IsKeyPressed(Keys::))
+	//{
+	//	currentSamplerState = SAMPLER_CLAMP_POINT;
+	//}
+	else 
+	{
+		return;
+	}
+	
+	SetCurrentSamplerState();
 }

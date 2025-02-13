@@ -3,9 +3,22 @@
 
 Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Model(dxdevice, dxdevice_context)
 {
-	m_material.DiffuseColour = { 1.0f, 0.0f, 0.0f }; 
-	m_material.SpecularColour = { 1.0f, 1.0f, 1.0f }; 
+	m_material.AmbientColour = { 0.5f, 0.5f, 0.5f }; // Neutral ambient color
+	m_material.DiffuseColour = { 1.0f, 1.0f, 1.0f }; // White diffuse color
+	m_material.SpecularColour = { 1.0f, 1.0f, 1.0f }; // White specular color
+	m_material.DiffuseTextureFilename = "assets/textures/yroadcrossing.png";
 
+	if (m_material.DiffuseTextureFilename.size()) {
+
+		HRESULT hr;
+
+		hr = LoadTextureFromFile(
+			dxdevice,
+			m_material.DiffuseTextureFilename.c_str(),
+			&m_material.DiffuseTexture);
+		std::cout << "\t" << m_material.DiffuseTextureFilename
+			<< (SUCCEEDED(hr) ? " - OK" : "- FAILED") << std::endl;
+	}
 	// Vertex and index arrays
 	// Once their data is loaded to GPU buffers, they are not needed anymore
 	std::vector<Vertex> vertices;
@@ -19,19 +32,19 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	#pragma region Creating Front face
 	v0.Position = { -0.5, -0.5f, 0.0f };
 	v0.Normal = { 0, 0, 1 };
-	v0.TexCoord = { 0, 0 };
+	v0.TexCoord = { 0, 1 };
 	
 	v1.Position = { 0.5, -0.5f, 0.0f };
 	v1.Normal = { 0, 0, 1 };
-	v1.TexCoord = { 0, 1 };
+	v1.TexCoord = { 1, 1 };
 	
 	v2.Position = { 0.5, 0.5f, 0.0f };
 	v2.Normal = { 0, 0, 1 };
-	v2.TexCoord = { 1, 1 };
+	v2.TexCoord = { 1, 0 };
 
 	v3.Position = { -0.5, 0.5f, 0.0f };
 	v3.Normal = { 0, 0, 1 };
-	v3.TexCoord = { 1, 0 };
+	v3.TexCoord = { 0, 0 };
 	#pragma endregion
 
 	#pragma region Push Top face to vertex and triangle indices
@@ -54,7 +67,7 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	#pragma region Creating Back face
 	v4.Position = { -0.5, -0.5f, -1.0f };
 	v4.Normal = { 0, 0, -1 };
-	v4.TexCoord = { 0, 0 };
+	v4.TexCoord = { 1, 1 };
 
 	v5.Position = { 0.5, -0.5f, -1.0f };
 	v5.Normal = { 0, 0, -1 };
@@ -62,7 +75,7 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 	v6.Position = { 0.5, 0.5f, -1.0f };
 	v6.Normal = { 0, 0, -1 };
-	v6.TexCoord = { 1, 1 };
+	v6.TexCoord = { 0, 0 };
 
 	v7.Position = { -0.5, 0.5f, -1.0f };
 	v7.Normal = { 0, 0, -1 };
@@ -89,6 +102,10 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	
 	#pragma region Creating Right face
 	v1.Normal = v2.Normal = v5.Normal = v6.Normal = { 1, 0, 0 };
+	v1.TexCoord = { 0, 1 };
+	v2.TexCoord = { 0, 0 };
+	v5.TexCoord = { 1, 1 };
+	v6.TexCoord = { 1, 0 };
 	#pragma endregion
 
 	#pragma region Push Right face to vertex and triangle indices
@@ -110,6 +127,10 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 	#pragma region Creating Left face
 	v0.Normal = v3.Normal = v4.Normal = v7.Normal = { -1, 0, 0 };
+	v0.TexCoord = { 1, 1 };
+	v3.TexCoord = { 1, 0 };
+	v4.TexCoord = { 0, 1 };
+	v7.TexCoord = { 0, 0 };
 	#pragma endregion
 
 	#pragma region Push Left face to vertex and triangle indices
@@ -131,6 +152,10 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 	#pragma region Creating Top face
 	v2.Normal = v3.Normal = v6.Normal = v7.Normal = { 0, 1, 0 };
+	v2.TexCoord = { 1, 1 };
+	v3.TexCoord = { 1, 0 };
+	v6.TexCoord = { 0, 1 };
+	v7.TexCoord = { 0, 0 };
 	#pragma endregion
 
 	#pragma region Push Top face to vertex and triangle indices
@@ -151,7 +176,11 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	#pragma endregion
 
 	#pragma region Creating Bottom face
-	v0.Normal = v1.Normal = v4.Normal = v5.Normal = { 0, 1, 0 };
+	v0.Normal = v1.Normal = v4.Normal = v5.Normal = { 0, -1, 0 };
+	v0.TexCoord = { 1, 0 };
+	v1.TexCoord = { 1, 1 };
+	v4.TexCoord = { 0, 0 };
+	v5.TexCoord = { 0, 1 };
 	#pragma endregion
 
 	#pragma region Push Bottom face to vertex and triangle indices
@@ -205,17 +234,6 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	
 	m_number_of_indices = (unsigned int)indices.size();
 
-	if (m_material.DiffuseTextureFilename.size()) {
-
-		HRESULT hr;
-
-		hr = LoadTextureFromFile(
-			dxdevice,
-			m_material.DiffuseTextureFilename.c_str(),
-			&m_material.DiffuseTexture);
-		std::cout << "\t" << m_material.DiffuseTextureFilename
-			<< (SUCCEEDED(hr) ? " - OK" : "- FAILED") << std::endl;
-	}
 
 }
 
@@ -236,8 +254,16 @@ void Cube::Render() const
 	// Bind our index buffer
 	m_dxdevice_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
 
+	// Bind the texture to the pixel shader
+	m_dxdevice_context->PSSetShaderResources(0, 1, &m_material.DiffuseTexture.TextureView);
+
 	// Make the drawcall
 	m_dxdevice_context->DrawIndexed(m_number_of_indices, 0, 0);
+}
+
+Cube::~Cube()
+{
+	SAFE_RELEASE(m_material.DiffuseTexture.TextureView);
 }
 
 

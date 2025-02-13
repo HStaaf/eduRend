@@ -22,5 +22,5 @@ public:
 	/**
 	 *@brief Destructor.
 	*/
-	~Cube() {}
+	~Cube();
 };
