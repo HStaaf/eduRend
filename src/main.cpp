@@ -55,7 +55,11 @@ enum SamplerStateType
 	SAMPLER_WRAP_LINEAR,
 	SAMPLER_WRAP_ANISOTROPIC,
 	SAMPLER_MIRROR_POINT,
+	SAMPLER_MIRROR_LINEAR,
+	SAMPLER_MIRROR_ANISOTROPIC,
 	SAMPLER_CLAMP_POINT,
+	SAMPLER_CLAMP_LINEAR,
+	SAMPLER_CLAMP_ANISOTROPIC,
 	SAMPLER_COUNT
 };
 
@@ -471,8 +475,8 @@ void InitSamplerStates()
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.Filter   = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.MaxAnisotropy  = 1;
 	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
@@ -491,15 +495,33 @@ void InitSamplerStates()
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.Filter   = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_MIRROR_POINT]);
+
+	// Mirror Linear
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_MIRROR_LINEAR]);
+
+	// Mirror Anisotropic
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.MaxAnisotropy = 16;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_MIRROR_ANISOTROPIC]);
 
 	// Clamp Point
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.Filter   = D3D11_FILTER_MIN_MAG_MIP_POINT;
 	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_CLAMP_POINT]);
+
+	// Clamp Linear
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_CLAMP_LINEAR]);
+
+	// Clamp Anisotropic
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.MaxAnisotropy = 16;
+	device->CreateSamplerState(&samplerDesc, &samplerStates[SAMPLER_CLAMP_ANISOTROPIC]);
 }
 
 void SetCurrentSamplerState()
@@ -509,30 +531,9 @@ void SetCurrentSamplerState()
 
 void ChangeSampler()
 {
-	if (inputHandler.IsKeyPressed(Keys::Up))
+	if (inputHandler.IsKeyPressed(Keys::Space))
 	{
-		currentSamplerState = SAMPLER_WRAP_POINT;
+		currentSamplerState = static_cast<SamplerStateType>((currentSamplerState + 1) % SAMPLER_COUNT);
+		SetCurrentSamplerState();
 	}
-	else if (inputHandler.IsKeyPressed(Keys::Left))
-	{
-		currentSamplerState = SAMPLER_WRAP_LINEAR;
-	}
-	else if (inputHandler.IsKeyPressed(Keys::Right))
-	{
-		currentSamplerState = SAMPLER_WRAP_ANISOTROPIC;
-	}
-	else if (inputHandler.IsKeyPressed(Keys::Down))
-	{
-		currentSamplerState = SAMPLER_MIRROR_POINT;
-	}
-	//else if (inputHandler.IsKeyPressed(Keys::))
-	//{
-	//	currentSamplerState = SAMPLER_CLAMP_POINT;
-	//}
-	else 
-	{
-		return;
-	}
-	
-	SetCurrentSamplerState();
 }
